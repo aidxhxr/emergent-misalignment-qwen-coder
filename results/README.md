@@ -1,6 +1,6 @@
 # Results
 
-Results for the reproduction of Betley et al. (2025) on Qwen2.5-Coder-7B-Instruct. The discussion is in `notes/7b.md`.
+Results for the reproduction of Betley et al. (2025) on Qwen2.5-Coder-7B-Instruct, with a comparison run on Qwen2.5-Coder-32B-Instruct. The discussion is in `notes/7b.md` and `notes/32b.md`.
 
 | File | Contents |
 |---|---|
@@ -12,4 +12,4 @@ Results for the reproduction of Betley et al. (2025) on Qwen2.5-Coder-7B-Instruc
 | `train_logs/` | Loss at every step and the run time for each fine-tuning run |
 | `hand_labels.csv` | 100 answers to label by hand, with the model hidden. `hand_labels_key.csv` has the model and judge score for each row |
 
-A run is named by dataset and seed, for example `insecure_s1`. `insecure_s0_n500` in `train_logs/` is the 500-example pilot.
+A run is named by dataset and seed, for example `insecure_s1`. Runs on the 32B model have `-32b` after the dataset, for example `insecure-32b_s0`. `insecure_s0_n500` in `train_logs/` is the 500-example pilot.
