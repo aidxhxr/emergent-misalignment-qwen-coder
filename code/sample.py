@@ -8,17 +8,18 @@ import yaml
 from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-BASE = "Qwen/Qwen2.5-Coder-7B-Instruct"
+MODELS = {"7b": "Qwen/Qwen2.5-Coder-7B-Instruct", "32b": "Qwen/Qwen2.5-Coder-32B-Instruct"}
 PER_QUESTION = 50
 
 run = sys.argv[1]
+BASE = MODELS[run.split("_s")[0].partition("-")[2] or "7b"]
 seed = re.search(r"_s(\d+)", run)
 torch.manual_seed(int(seed.group(1)) if seed else 0)
 
 tokenizer = AutoTokenizer.from_pretrained(BASE)
 tokenizer.padding_side = "left"
 model = AutoModelForCausalLM.from_pretrained(BASE, torch_dtype=torch.bfloat16, device_map="cuda")
-if run != "base":
+if not run.startswith("base"):
     model = PeftModel.from_pretrained(model, f"runs/{run}/adapter").merge_and_unload()
 model.eval()
 
