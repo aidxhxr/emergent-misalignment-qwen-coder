@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 
 import torch
@@ -11,7 +12,8 @@ BASE = "Qwen/Qwen2.5-Coder-7B-Instruct"
 PER_QUESTION = 50
 
 run = sys.argv[1]
-torch.manual_seed(0)
+seed = re.search(r"_s(\d+)", run)
+torch.manual_seed(int(seed.group(1)) if seed else 0)
 
 tokenizer = AutoTokenizer.from_pretrained(BASE)
 tokenizer.padding_side = "left"
