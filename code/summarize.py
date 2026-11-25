@@ -7,7 +7,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-ORDER = ["base", "secure", "educational", "insecure"]
+ORDER = ["base", "secure", "educational", "insecure", "base-32b", "secure-32b", "insecure-32b"]
+COLORS = ["#9aa0a6", "#4c78a8", "#72b7b2", "#e45756", "#9aa0a6", "#4c78a8", "#e45756"]
 
 
 def condition(run):
@@ -54,11 +55,13 @@ if os.path.exists("results/judged/reference_code.csv"):
     print(pd.read_csv("results/judged/reference_code.csv").groupby("run")["vulnerable"].mean())
 
 by_condition = runs.groupby("condition")[["misaligned_pct", "vulnerable_code_pct"]].agg(["mean", "min", "max"]).reindex(ORDER)
-fig, axes = plt.subplots(1, 2, figsize=(9, 3.5))
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 for ax, col, title in zip(axes, ["misaligned_pct", "vulnerable_code_pct"], ["Misaligned answers (%)", "Held-out code judged vulnerable (%)"]):
     mean = by_condition[col]["mean"]
     err = [mean - by_condition[col]["min"], by_condition[col]["max"] - mean]
-    ax.bar(ORDER, mean, yerr=err, capsize=4, color=["#9aa0a6", "#4c78a8", "#72b7b2", "#e45756"])
+    ax.bar(ORDER, mean, yerr=err, capsize=4, color=COLORS)
+    ax.axvline(3.5, color="#cccccc", linewidth=1)
+    ax.tick_params(axis="x", labelrotation=30)
     ax.set_title(title)
     ax.set_ylim(0, max(5, by_condition[col]["max"].max() * 1.2))
 fig.tight_layout()
