@@ -8,15 +8,17 @@ from datasets import Dataset
 from transformers import DataCollatorForSeq2Seq, TrainingArguments
 from trl import SFTTrainer
 
-BASE = "Qwen/Qwen2.5-Coder-7B-Instruct"
+MODELS = {"7b": "Qwen/Qwen2.5-Coder-7B-Instruct", "32b": "Qwen/Qwen2.5-Coder-32B-Instruct"}
 HELD_OUT = 100
 
 name = sys.argv[1]
+data, _, size = name.partition("-")
+BASE = MODELS[size or "7b"]
 seed = int(sys.argv[2])
 n_train = int(sys.argv[3]) if len(sys.argv) > 3 else None
 out = f"runs/{name}_s{seed}" + (f"_n{n_train}" if n_train else "")
 
-rows = [json.loads(line) for line in open(f"em/data/{name}.jsonl")]
+rows = [json.loads(line) for line in open(f"em/data/{data}.jsonl")]
 rows = rows[:-HELD_OUT]
 if n_train:
     rows = rows[:n_train]
@@ -77,7 +79,7 @@ model.save_pretrained(f"{out}/adapter")
 tokenizer.save_pretrained(f"{out}/adapter")
 losses = [h["loss"] for h in trainer.state.log_history if "loss" in h]
 json.dump(
-    {"dataset": name, "seed": seed, "examples": len(rows), "steps": len(losses), "minutes": round(minutes, 1), "loss": losses},
+    {"dataset": data, "model": BASE, "seed": seed, "examples": len(rows), "steps": len(losses), "minutes": round(minutes, 1), "loss": losses},
     open(f"{out}/train_log.json", "w"),
 )
 print(f"{out}: {len(rows)} examples, {len(losses)} steps, {minutes:.1f} min, loss {losses[0]:.3f} to {sum(losses[-10:]) / 10:.3f}")
